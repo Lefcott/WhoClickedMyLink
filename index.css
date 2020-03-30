@@ -1,0 +1,28 @@
+body {
+  background-color: #ddd;
+  overflow: hidden;
+}
+.button {
+  position: absolute;
+  width: 50%;
+  height: 50%;
+  transition: 0.3s;
+  cursor: pointer;
+  background-color: rgb(61, 149, 175);
+  font-size: 30px;
+}
+.button:hover {
+  font-size: 80px;
+  background-color: rgb(24, 169, 212);
+  border-style: solid;
+  border-width: 5px;
+  border-radius: 15px;
+}
+#button1 {
+  left: 0;
+  top: 0;
+}
+#button2 {
+  left: 50%;
+  top: 50%;
+}

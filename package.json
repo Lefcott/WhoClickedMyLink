@@ -1,0 +1,20 @@
+{
+  "name": "whoclickedmylink",
+  "version": "1.0.0",
+  "description": "Find out who clicked your link",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon -e js,json,html,css index",
+    "start": "node index",
+    "redis": "rdcli -h redis-19125.c8.us-east-1-2.ec2.cloud.redislabs.com -a qmAA8vTGzBrR8ux3VNumKHe0LxZfVzHc -p 19125"
+  },
+  "author": "Leandro Cotti",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "moment": "^2.24.0",
+    "redis": "^3.0.2"
+  }
+}

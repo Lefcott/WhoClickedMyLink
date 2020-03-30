@@ -1,0 +1,16 @@
+<html>
+  <head>
+    <title>Create link</title>
+    <link rel = 'stylesheet' href = 'create-link.css'></link>
+  </head>
+<body>
+  <input type = 'button' value = 'VOLVER' onclick = 'window.location = "/";'>
+  <h1>Pon&eacute; tu link</h1><br>
+  <input id = 'link' type = 'text'>
+  <input id = 'create' type = 'button' value = 'CREAR LINK' onclick = 'parse();'>
+  <input id = 'result' type = 'text'>
+  <script>
+    const parse = () => document.getElementById('result').value = `https://who-clicked-my-link.herokuapp.com/link/${encodeURIComponent(document.getElementById('link').value)}`;
+  </script>
+</body>
+</html>
