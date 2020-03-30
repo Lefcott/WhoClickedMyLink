@@ -70,7 +70,7 @@ app.get('/history', (req, res) => {
 });
 
 app.get('/link/:link', (req, res) => {
-  const reg = [req.ip, parseDate(moment().utcOffset(3).format()), req.params.link];
+  const reg = [req.ip, parseDate(moment().utcOffset('-0300').format()), req.params.link];
   redis.sadd('history', JSON.stringify(reg), (error, result) => {
     if (error) {
       return console.error('REDIS error saving history register', error);
