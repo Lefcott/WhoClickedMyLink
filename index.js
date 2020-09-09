@@ -1,15 +1,16 @@
-require('./env');
+require("./env");
+const session = require("express-session");
+const RedisStore = require("connect-redis")(session);
+const express = require("express");
+const moment = require("moment");
 
-const express = require('express');
-const moment = require('moment');
-
-const redis = require('./redis');
+const redis = require("./redis");
 
 const app = express();
 
-app.set('trust proxy', true);
+app.set("trust proxy", true);
 
-const parseDate = str => {
+const parseDate = (str) => {
   const date = new Date(str);
   let month = date.getMonth();
   let day = date.getDate();
@@ -23,27 +24,67 @@ const parseDate = str => {
   return `${day}/${month}/${year} ${hours}:${minutes}`;
 };
 
-app.get('/', (req, res) => {
+app.use(
+  session({
+    store: new RedisStore({ client: redis }),
+    secret: "dflksjdlfaksdjflaskdfjalsdkf",
+    saveUninitialized: true,
+    resave: false,
+  })
+);
+
+app.get("/link/:link", (req, res) => {
+  const link = Buffer.from(req.params.link, "base64").toString();
+  const reg = [req.ip, parseDate(moment().utcOffset("-0300").format()), link];
+  redis.sadd("history", JSON.stringify(reg), (error, result) => {
+    if (error) {
+      return console.error("REDIS error saving history register", error);
+    }
+    console.log(result);
+  });
+  res.redirect(link);
+});
+app.use((req, res, next) => {
+  if (req.session.loggedIn) return next();
+  if (req.query.username === "bloome" && req.query.password === "takoshi") {
+    req.session.loggedIn = true;
+    return next();
+  }
+  res.status(200).send(`
+<html>
+  <body>
+  <script>
+  const user = prompt('Usuario');
+  const pass = prompt('Contraseña');
+  window.location.href = '/?username=' + encodeURIComponent(user) + '&password=' + encodeURIComponent(pass);
+  </script>
+  </body>
+</html>
+`);
+});
+
+app.get("/", (req, res) => {
+  if (req.query.username || req.query.password) return res.redirect("/");
   res.sendFile(`${__dirname}/index.html`);
 });
 
-app.get('/index.css', (req, res) => {
+app.get("/index.css", (req, res) => {
   res.sendFile(`${__dirname}/index.css`);
 });
 
-app.get('/create-link', (req, res) => {
+app.get("/create-link", (req, res) => {
   res.sendFile(`${__dirname}/create-link.html`);
 });
 
-app.get('/create-link.css', (req, res) => {
+app.get("/create-link.css", (req, res) => {
   res.sendFile(`${__dirname}/create-link.css`);
 });
 
-app.get('/history', (req, res) => {
-  redis.smembers('history', (error, members) => {
+app.get("/history", (req, res) => {
+  redis.smembers("history", (error, members) => {
     if (error) {
-      console.error('Redis error getting list');
-      return res.send('Redis error getting list');
+      console.error("Redis error getting list");
+      return res.send("Redis error getting list");
     }
     res.send(`
 <html>
@@ -57,11 +98,20 @@ app.get('/history', (req, res) => {
       <th>Fecha y hora (DMA)</th>
       <th>Link</th>
     </tr>
-    ${members.map(member => `
+    ${members
+      .map(
+        (member) => `
     <tr style = 'text-align: center;'>
-      ${JSON.parse(member).map(cell => `<td style = 'border-style: solid; border-width: 1px;'>${cell}</td>`).join('<br>')}
+      ${JSON.parse(member)
+        .map(
+          (cell) =>
+            `<td style = 'border-style: solid; border-width: 1px;'>${cell}</td>`
+        )
+        .join("<br>")}
     </tr>
-    `).join('<br>')}
+    `
+      )
+      .join("<br>")}
   </table>
 </body>
 </html>
@@ -69,18 +119,8 @@ app.get('/history', (req, res) => {
   });
 });
 
-app.get('/link/:link', (req, res) => {
-  const link = Buffer.from(req.params.link, 'base64').toString();
-  const reg = [req.ip, parseDate(moment().utcOffset('-0300').format()), link];
-  redis.sadd('history', JSON.stringify(reg), (error, result) => {
-    if (error) {
-      return console.error('REDIS error saving history register', error);
-    }
-    console.log(result);
-  });
-  res.redirect(link);
-});
-
 app.listen(process.env.PORT, () => {
-  console.log(`Listening on ${process.env.PORT} with environment ${process.env.NODE_ENV}`);
+  console.log(
+    `Listening on ${process.env.PORT} with environment ${process.env.NODE_ENV}`
+  );
 });
