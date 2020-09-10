@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon -e js,json,html,css index",
     "start": "node index",
-    "redis": "rdcli -h redis-19125.c8.us-east-1-2.ec2.cloud.redislabs.com -a qmAA8vTGzBrR8ux3VNumKHe0LxZfVzHc -p 19125"
+    "redis": "rdcli -h redis-11725.c241.us-east-1-4.ec2.cloud.redislabs.com -a 72zHP66O2Pb9cCL6Xfs36mdfjK9rQPCk -p 11725"
   },
   "author": "Leandro Cotti",
   "license": "ISC",
